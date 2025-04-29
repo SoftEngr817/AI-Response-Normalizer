@@ -1,94 +1,115 @@
-
-/* ========= Settings ========= */
-const SETTINGS_KEY = 'simpleTextToolSettings';
+const SETTINGS_KEY = "simpleTextToolSettings";
 
 function loadSettings() {
-  const saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
-  if (saved.fontSize) document.documentElement.style.setProperty('--font-size', saved.fontSize + 'px');
-  if (saved.fontFamily) document.documentElement.style.setProperty('--font-family', saved.fontFamily);
-  return saved;
+  return JSON.parse(localStorage.getItem(SETTINGS_KEY) || "{}");
+}
+function saveSettings(obj) {
+  localStorage.setItem(
+    SETTINGS_KEY,
+    JSON.stringify({ ...loadSettings(), ...obj })
+  );
 }
 
-function saveSettings(fontSize, fontFamily) {
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify({ fontSize, fontFamily }));
-  loadSettings();
-}
-
-/* ========= Core Functionalities ========= */
-function function_1(raw) {
-  const lines = raw.split(/\r?\n/).map(l => l.trim()); // trim both ends
-  const cleaned = [];
-  let lastBlank = false;
-  for (const line of lines) {
-    const isBlank = line === '';
-    if (isBlank && lastBlank) continue;
-    cleaned.push(line);
-    lastBlank = isBlank;
-  }
-  return cleaned.join('\n');
-}
-
-function function_2(raw) { return raw.toUpperCase(); }
-function function_3(raw) { return raw; }
-
-const FUNC_MAP = {
-  function_1,
-  function_2,
-  function_3
+/* filters */
+const filters = {
+  trimBlanks: (t) => t.replace(/^(?:\s*[\r\n])+|(?:\s*[\r\n])+$/g, ""),
+  collapseBlanks: (t) => t.replace(/(\r?\n){2,}/g, "\n\n"),
+  bold: (t) => t.replace(/\*\*(.*?)\*\*|__(.*?)__/g, "$1$2"),
+  italic: (t) => t.replace(/\*(.*?)\*|_(.*?)_/g, "$1$2"),
+  code: (t) => t.replace(/`{1,3}([^`]*)`{1,3}/g, "$1"),
+  linkText: (t) => t.replace(/\[([^\]]+)]\([^)]*\)/g, "$1"),
+  linkURL: (t) =>
+    t.replace(
+      /\[([^\]]+)]\((https?:\/\/)?(www\.)?([^/)]+)([^)]*?)\)/gi,
+      (m, _text, _p, _w, domain, rest) => domain + rest.replace(/\/$/, "")
+    ),
+  check2dash: (t) => t.replace(/✅/g, "-"),
 };
 
-/* ========= Toast helper ========= */
-function showToast(msg, duration = 2500) {
-  const toast = document.getElementById('toast');
-  toast.textContent = msg;
-  toast.style.opacity = '1';
-  setTimeout(() => { toast.style.opacity = '0'; }, duration);
+function normalizeAlways(raw) {
+  return raw
+    .split(/\r?\n/)
+    .map((l) => l.replace(/\s+$/g, ""))
+    .join("\n")
+    .replace(/[‘’‛‹›]/g, "'")
+    .replace(/[“”«»„″]/g, '"');
 }
 
-/* ========= Runner ========= */
-function process() {
-  const inputVal = document.getElementById('input').value;
-  const selectedFunc = document.querySelector('input[name="func"]:checked').value;
-  const output = document.getElementById('output');
-  output.textContent = FUNC_MAP[selectedFunc](inputVal);
+function function_1(raw) {
+  let out = normalizeAlways(raw);
+  const active = [
+    ...document.querySelectorAll("#filter-group input:checked"),
+  ].map((cb) => cb.value);
+  active.forEach((k) => (out = filters[k](out)));
+  return out;
 }
 
-/* ========= UI Handlers ========= */
-document.addEventListener('DOMContentLoaded', () => {
-  const input = document.getElementById('input');
-  const copyBtn = document.getElementById('copy-btn');
-  const settingsBtn = document.getElementById('open-settings');
-  const settingsModal = document.getElementById('settings-modal');
-  const fontSizeInput = document.getElementById('font-size');
-  const fontFamilyInput = document.getElementById('font-family');
-  const saveSettingsBtn = document.getElementById('save-settings');
-  const radioGroup = document.getElementById('func-group');
+function showToast(msg, ms = 2500) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.style.opacity = "1";
+  setTimeout(() => (t.style.opacity = "0"), ms);
+}
 
-  // Load existing settings
-  const current = loadSettings();
-  if (current.fontSize) fontSizeInput.value = current.fontSize;
-  if (current.fontFamily) fontFamilyInput.value = current.fontFamily;
+document.addEventListener("DOMContentLoaded", () => {
+  const input = document.getElementById("input");
+  const output = document.getElementById("output");
+  const copyBtn = document.getElementById("copy-btn");
+  const filterGroup = document.getElementById("filter-group");
+  const settingsBtn = document.getElementById("open-settings");
+  const settingsModal = document.getElementById("settings-modal");
+  const fontSizeIn = document.getElementById("font-size");
+  const fontFamilyIn = document.getElementById("font-family");
+  const saveBtn = document.getElementById("save-settings");
 
-  // listeners
-  input.addEventListener('input', process);
-  radioGroup.addEventListener('change', process);
+  /* apply saved prefs */
+  const saved = loadSettings();
+  if (saved.fontSize)
+    document.documentElement.style.setProperty(
+      "--font-size",
+      saved.fontSize + "px"
+    );
+  if (saved.fontFamily)
+    document.documentElement.style.setProperty(
+      "--font-family",
+      saved.fontFamily
+    );
+  if (saved.filters) {
+    [...filterGroup.querySelectorAll("input")].forEach((cb) => {
+      cb.checked = saved.filters.includes(cb.value);
+    });
+  }
 
-  copyBtn.addEventListener('click', () => {
-    navigator.clipboard.writeText(document.getElementById('output').textContent)
-      .then(() => showToast('Copied to clipboard!'))
-      .catch(err => showToast('Copy failed: ' + err, 3000));
+  const process = () => {
+    output.textContent = function_1(input.value);
+  };
+  input.addEventListener("input", process);
+  filterGroup.addEventListener("change", () => {
+    saveSettings({
+      filters: [...filterGroup.querySelectorAll("input:checked")].map(
+        (cb) => cb.value
+      ),
+    });
+    process();
+  });
+  copyBtn.addEventListener("click", () => {
+    navigator.clipboard
+      .writeText(output.textContent)
+      .then(() => showToast("Copied!"))
+      .catch((e) => showToast("Copy failed", 3000));
   });
 
-  settingsBtn.addEventListener('click', () => settingsModal.showModal());
-
-  saveSettingsBtn.addEventListener('click', (e) => {
+  settingsBtn.addEventListener("click", () => settingsModal.showModal());
+  if (saved.fontSize) fontSizeIn.value = saved.fontSize;
+  if (saved.fontFamily) fontFamilyIn.value = saved.fontFamily;
+  saveBtn.addEventListener("click", (e) => {
     e.preventDefault();
-    const size = parseInt(fontSizeInput.value, 10);
-    const family = fontFamilyInput.value.trim();
-    saveSettings(size, family);
+    saveSettings({
+      fontSize: parseInt(fontSizeIn.value, 10) || undefined,
+      fontFamily: fontFamilyIn.value.trim() || undefined,
+    });
     settingsModal.close();
   });
 
-  // initial
   process();
 });

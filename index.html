@@ -1,76 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Simple Text Tool</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-  <!-- Toolbar -->
-  <header id="toolbar">
-    <fieldset id="func-group">
-      <legend class="visually-hidden">Text functions</legend>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Simple Text Normalizer – Dark</title>
+    <link rel="icon" type="image/png" href="/resources/favicon.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- Toolbar -->
+    <header id="toolbar">
+      <fieldset id="filter-group">
+        <legend class="visually-hidden">Optional filters</legend>
 
-      <label class="func-item">
-        <input type="radio" name="func" value="function_1" checked>
-        <span class="bullet"></span>
-        <span class="func-label">func&nbsp;1</span>
-      </label>
+        <label class="filter"
+          ><input type="checkbox" value="trimBlanks" /><abbr
+            title="Remove blank lines at very start and end"
+            >TB</abbr
+          ></label
+        >
+        <label class="filter"
+          ><input type="checkbox" value="collapseBlanks" /><abbr
+            title="Collapse 2+ blank lines to one"
+            >CB</abbr
+          ></label
+        >
+        <label class="filter"
+          ><input type="checkbox" value="bold" /><abbr
+            title="Strip **bold** markdown"
+            >B</abbr
+          ></label
+        >
+        <label class="filter"
+          ><input type="checkbox" value="italic" /><abbr
+            title="Strip *italic* markdown"
+            >I</abbr
+          ></label
+        >
+        <label class="filter"
+          ><input type="checkbox" value="code" /><abbr
+            title="Strip `inline code` markdown"
+            >C</abbr
+          ></label
+        >
+        <label class="filter"
+          ><input type="checkbox" value="linkText" /><abbr
+            title="Links → keep text"
+            >L₁</abbr
+          ></label
+        >
+        <label class="filter"
+          ><input type="checkbox" value="linkURL" /><abbr
+            title="Links → keep URL (trim proto/www/)"
+            >L₂</abbr
+          ></label
+        >
+        <label class="filter"
+          ><input type="checkbox" value="check2dash" /><abbr
+            title="Replace ✅ with dash"
+            >✓→-</abbr
+          ></label
+        >
+      </fieldset>
 
-      <label class="func-item">
-        <input type="radio" name="func" value="function_2">
-        <span class="bullet"></span>
-        <span class="func-label">func&nbsp;2</span>
-      </label>
+      <button id="open-settings" class="settings-btn" title="Display settings">
+        ⚙️
+      </button>
+    </header>
 
-      <label class="func-item">
-        <input type="radio" name="func" value="function_3">
-        <span class="bullet"></span>
-        <span class="func-label">func&nbsp;3</span>
-      </label>
-    </fieldset>
+    <!-- Workspace -->
+    <main>
+      <section class="pane">
+        <textarea id="input" placeholder="Paste AI response here…"></textarea>
+      </section>
+      <section class="pane">
+        <div
+          id="output"
+          class="output"
+          tabindex="0"
+          aria-label="Processed text (read only)"
+        ></div>
+        <button id="copy-btn" class="copy-btn">Copy Text</button>
+      </section>
+    </main>
 
-    <button id="open-settings" title="Settings" class="settings-btn">⚙️</button>
-  </header>
+    <!-- Toast -->
+    <div id="toast" aria-live="polite"></div>
 
-  <!-- Workspace -->
-  <main>
-    <section class="pane">
-      <textarea id="input" placeholder="Text Input Field (Editable)"></textarea>
-    </section>
+    <!-- Settings Modal -->
+    <dialog id="settings-modal">
+      <form method="dialog" id="settings-form">
+        <h2>Display Settings</h2>
+        <label
+          >Font size (px):
+          <input type="number" id="font-size" min="10" max="48" step="1"
+        /></label>
+        <label
+          >Font family:
+          <input type="text" id="font-family" placeholder="e.g., monospace"
+        /></label>
+        <menu
+          ><button value="cancel">Cancel</button
+          ><button value="save" id="save-settings">Save</button></menu
+        >
+      </form>
+    </dialog>
 
-    <section class="pane">
-      <div id="output" class="output" tabindex="0" aria-label="Processed text (read only)"></div>
-      <button id="copy-btn" class="copy-btn">Copy&nbsp;Text</button>
-    </section>
-  </main>
-
-  <!-- Toast notification -->
-  <div id="toast" aria-live="polite"></div>
-
-  <!-- Settings Modal -->
-  <dialog id="settings-modal">
-    <form method="dialog" id="settings-form">
-      <h2>Display Settings</h2>
-
-      <label>
-        Font size (px):
-        <input type="number" id="font-size" min="10" max="48" step="1">
-      </label>
-
-      <label>
-        Font family:
-        <input type="text" id="font-family" placeholder="e.g., monospace">
-      </label>
-
-      <menu>
-        <button value="cancel">Cancel</button>
-        <button value="save" id="save-settings">Save</button>
-      </menu>
-    </form>
-  </dialog>
-
-  <script src="script.js"></script>
-</body>
+    <script src="script.js"></script>
+  </body>
 </html>
