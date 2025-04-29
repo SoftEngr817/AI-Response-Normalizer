@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Simple Text Tool</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Toolbar -->
+  <header id="toolbar">
+    <fieldset id="func-group">
+      <legend class="visually-hidden">Text functions</legend>
+
+      <label class="func-item">
+        <input type="radio" name="func" value="function_1" checked>
+        <span class="bullet"></span>
+        <span class="func-label">func&nbsp;1</span>
+      </label>
+
+      <label class="func-item">
+        <input type="radio" name="func" value="function_2">
+        <span class="bullet"></span>
+        <span class="func-label">func&nbsp;2</span>
+      </label>
+
+      <label class="func-item">
+        <input type="radio" name="func" value="function_3">
+        <span class="bullet"></span>
+        <span class="func-label">func&nbsp;3</span>
+      </label>
+    </fieldset>
+
+    <button id="open-settings" title="Settings" class="settings-btn">⚙️</button>
+  </header>
+
+  <!-- Workspace -->
+  <main>
+    <section class="pane">
+      <textarea id="input" placeholder="Text Input Field (Editable)"></textarea>
+    </section>
+
+    <section class="pane">
+      <div id="output" class="output" tabindex="0" aria-label="Processed text (read only)"></div>
+      <button id="copy-btn" class="copy-btn">Copy&nbsp;Text</button>
+    </section>
+  </main>
+
+  <!-- Toast notification -->
+  <div id="toast" aria-live="polite"></div>
+
+  <!-- Settings Modal -->
+  <dialog id="settings-modal">
+    <form method="dialog" id="settings-form">
+      <h2>Display Settings</h2>
+
+      <label>
+        Font size (px):
+        <input type="number" id="font-size" min="10" max="48" step="1">
+      </label>
+
+      <label>
+        Font family:
+        <input type="text" id="font-family" placeholder="e.g., monospace">
+      </label>
+
+      <menu>
+        <button value="cancel">Cancel</button>
+        <button value="save" id="save-settings">Save</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <script src="script.js"></script>
+</body>
+</html>

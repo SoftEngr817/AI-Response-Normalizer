@@ -1,0 +1,171 @@
+
+:root {
+  --toolbar-height: 70px;
+  --primary: #0d6efd;
+  --surface: #ffffff;
+  --border: #ced4da;
+  --font-family: monospace; /* fallback */
+  --font-size: 16px;
+}
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font-family, monospace);
+  font-size: var(--font-size, 16px);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #f8f9fa;
+}
+
+/* Toolbar */
+header#toolbar {
+  height: var(--toolbar-height);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 12px 32px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.settings-btn {
+  background: none;
+  border: none;
+  font-size: 26px;
+  cursor: pointer;
+}
+
+#func-group {
+  display: flex;
+  gap: 32px;
+  margin: 0;
+  border: none;
+}
+
+.func-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.func-item input {
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border: 2px solid #000;
+  border-radius: 50%;
+  position: relative;
+}
+
+.func-item input:checked::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  background: #000;
+  border-radius: 50%;
+}
+
+main {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.pane {
+  flex: 1 1 50%;
+  min-width: 300px;
+  position: relative;
+  padding: 32px;
+}
+
+textarea#input,
+.output {
+  width: 100%;
+  height: calc(100% - 24px);
+  padding: 12px;
+  resize: none;
+  border: 2px solid #000;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: inherit;
+  background: var(--surface);
+}
+
+.output {
+  white-space: pre-wrap;
+  overflow-y: auto;
+}
+
+.copy-btn {
+  position: absolute;
+  top: 32px;
+  right: 32px;
+  padding: 6px 18px;
+  border: 2px solid var(--primary);
+  background: var(--primary);
+  color: #fff;
+  font-weight: 600;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.copy-btn:hover {
+  filter: brightness(1.1);
+}
+
+/* Toast */
+#toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #323232;
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 24px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  max-width: 90%;
+  font-size: 15px;
+}
+
+/* Settings modal */
+dialog#settings-modal {
+  border: none;
+  padding: 24px;
+  border-radius: 6px;
+  max-width: 300px;
+}
+
+dialog form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+dialog input {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+dialog menu {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+  .pane { flex: 1 1 100%; }
+}
