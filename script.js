@@ -33,7 +33,8 @@ function normalizeAlways(raw) {
     .join("\n")
     .replace(/[‘’‛‹›]/g, "'")
     .replace(/[“”«»„″]/g, '"')
-    .replace(/[—]/g, " - ");
+    .replace(/ — /g, " - ")
+    .replace(/—/g, " - ");
 }
 
 function function_1(raw) {
