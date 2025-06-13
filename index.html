@@ -1,111 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Simple Text Normalizer – Dark</title>
-    <link rel="icon" type="image/png" href="/resources/favicon.png">
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <!-- Toolbar -->
-    <header id="toolbar">
-      <fieldset id="filter-group">
-        <legend class="visually-hidden">Optional filters</legend>
+<head>
+  <meta charset="UTF-8" />
+  <title>Simple Text Normalizer – Dark</title>
+  <link rel="icon" type="image/png" href="/resources/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header id="toolbar">
+    <fieldset id="filter-group">
+      <legend class="visually-hidden">Filters</legend>
+      <label class="filter"><input type="checkbox" value="trimBlanks"><abbr title="Trim blank lines at start/end">TB</abbr></label>
+      <label class="filter"><input type="checkbox" value="collapseBlanks"><abbr title="Collapse ≥2 blank lines">CB</abbr></label>
+      <label class="filter"><input type="checkbox" value="bold"><abbr title="Strip **bold**">B</abbr></label>
+      <label class="filter"><input type="checkbox" value="italic"><abbr title="Strip *italic*">I</abbr></label>
+      <label class="filter"><input type="checkbox" value="code"><abbr title="Strip `code`">C</abbr></label>
+      <label class="filter"><input type="checkbox" value="linkText"><abbr title="Links→text">L₁</abbr></label>
+      <label class="filter"><input type="checkbox" value="linkURL"><abbr title="Links→URL">L₂</abbr></label>
+    </fieldset>
 
-        <label class="filter"
-          ><input type="checkbox" value="trimBlanks" /><abbr
-            title="Remove blank lines at very start and end"
-            >TB</abbr
-          ></label
-        >
-        <label class="filter"
-          ><input type="checkbox" value="collapseBlanks" /><abbr
-            title="Collapse 2+ blank lines to one"
-            >CB</abbr
-          ></label
-        >
-        <label class="filter"
-          ><input type="checkbox" value="bold" /><abbr
-            title="Strip **bold** markdown"
-            >B</abbr
-          ></label
-        >
-        <label class="filter"
-          ><input type="checkbox" value="italic" /><abbr
-            title="Strip *italic* markdown"
-            >I</abbr
-          ></label
-        >
-        <label class="filter"
-          ><input type="checkbox" value="code" /><abbr
-            title="Strip `inline code` markdown"
-            >C</abbr
-          ></label
-        >
-        <label class="filter"
-          ><input type="checkbox" value="linkText" /><abbr
-            title="Links → keep text"
-            >L₁</abbr
-          ></label
-        >
-        <label class="filter"
-          ><input type="checkbox" value="linkURL" /><abbr
-            title="Links → keep URL (trim proto/www/)"
-            >L₂</abbr
-          ></label
-        >
-        <label class="filter"
-          ><input type="checkbox" value="check2dash" /><abbr
-            title="Replace ✅ with dash"
-            >✓→-</abbr
-          ></label
-        >
-      </fieldset>
+    <div class="toolbar-actions">
+      <button id="open-mapping" class="settings-btn" title="Custom replacements">🛠️</button>
+      <button id="open-settings" class="settings-btn" title="Display settings">⚙️</button>
+    </div>
+  </header>
 
-      <button id="open-settings" class="settings-btn" title="Display settings">
-        ⚙️
-      </button>
-    </header>
+  <main>
+    <section class="pane"><textarea id="input" placeholder="Paste AI response…"></textarea></section>
+    <section class="pane">
+      <div id="output" class="output"></div>
+      <button id="copy-btn" class="copy-btn">Copy Text</button>
+    </section>
+  </main>
 
-    <!-- Workspace -->
-    <main>
-      <section class="pane">
-        <textarea id="input" placeholder="Paste AI response here…"></textarea>
-      </section>
-      <section class="pane">
-        <div
-          id="output"
-          class="output"
-          tabindex="0"
-          aria-label="Processed text (read only)"
-        ></div>
-        <button id="copy-btn" class="copy-btn">Copy Text</button>
-      </section>
-    </main>
+  <div id="toast" aria-live="polite"></div>
 
-    <!-- Toast -->
-    <div id="toast" aria-live="polite"></div>
+  <!-- settings -->
+  <dialog id="settings-modal">
+    <form method="dialog" id="settings-form">
+      <h2>Display Settings</h2>
+      <label>Font size(px): <input id="font-size" type="number" min="10" max="48" step="1"></label>
+      <label>Font family: <input id="font-family" type="text" placeholder="e.g., monospace"></label>
+      <menu><button value="cancel">Cancel</button><button id="save-settings">Save</button></menu>
+    </form>
+  </dialog>
 
-    <!-- Settings Modal -->
-    <dialog id="settings-modal">
-      <form method="dialog" id="settings-form">
-        <h2>Display Settings</h2>
-        <label
-          >Font size (px):
-          <input type="number" id="font-size" min="10" max="48" step="1"
-        /></label>
-        <label
-          >Font family:
-          <input type="text" id="font-family" placeholder="e.g., monospace"
-        /></label>
-        <menu
-          ><button value="cancel">Cancel</button
-          ><button value="save" id="save-settings">Save</button></menu
-        >
-      </form>
-    </dialog>
+  <!-- mapping -->
+  <dialog id="mapping-modal">
+    <h2>Custom replacements</h2>
+    <div class="table-wrap">
+      <table id="mapping-table">
+        <thead><tr><th>Find</th><th>Replace</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <menu>
+      <button id="add-row">＋Row</button>
+      <input type="file" id="file-import" accept=".json" hidden>
+      <button id="import-json">Import JSON</button>
+      <button id="export-json">Export JSON</button>
+      <button id="save-mapping">Save & Close</button>
+    </menu>
+  </dialog>
 
-    <script src="script.js"></script>
-  </body>
+  <script src="script.js"></script>
+</body>
 </html>
