@@ -14,7 +14,7 @@ main{flex:1;display:flex;flex-wrap:wrap;overflow:hidden}
 .pane{flex:1 1 50%;min-width:300px;position:relative;padding:30px;height:100%;overflow:hidden}
 textarea#input,.output{width:100%;height:100%;padding:12px;border:2px solid var(--border);border-radius:6px;background:#1b1b1b;color:var(--text);font-family:inherit;font-size:var(--font-size);resize:none}
 .output{white-space:pre-wrap;overflow:auto}
-.copy-btn{position:absolute;top:15px;right:36px;padding:8px 22px;border:none;background:var(--primary);color:#fff;border-radius:4px;cursor:pointer}
+.btn-over-textarea{position:absolute;top:15px;right:36px;padding:8px 22px;border:none;background:var(--primary);color:#fff;border-radius:4px;cursor:pointer}
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#424242;color:#fff;padding:12px 24px;border-radius:24px;opacity:0;pointer-events:none;transition:opacity .3s}
 dialog{background:#1e1e1e;color:var(--text);border:none;border-radius:6px;padding:20px}
 dialog input{background:#121212;color:var(--text);border:1px solid var(--border);padding:6px;border-radius:4px;width:100%}

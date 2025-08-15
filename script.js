@@ -40,7 +40,7 @@ const mapToTable=map=>{qs('mapping-table').querySelector('tbody').innerHTML=''; 
 const tableToMap=()=>{const obj={};[...qs('mapping-table').querySelectorAll('tbody tr')].forEach(r=>{const [a,b]=r.querySelectorAll('input'); if(a.value) obj[a.value]=b.value;});return obj;};
 
 document.addEventListener('DOMContentLoaded',()=>{
- const input=qs('input'),output=qs('output'),copyBtn=qs('copy-btn');
+ const input=qs('input'),output=qs('output'),clearFocusBtn=qs('clear-focus'),copyBtn=qs('copy-btn');
  const filterGroup=qs('filter-group');
  const settingsBtn=qs('open-settings'),mappingBtn=qs('open-mapping');
  const settingsDlg=qs('settings-modal'),mappingDlg=qs('mapping-modal');
@@ -57,6 +57,13 @@ document.addEventListener('DOMContentLoaded',()=>{
  const render=()=>output.textContent=processText(input.value);
  input.addEventListener('input',render);
  filterGroup.addEventListener('change',()=>{saveSettings({filters:[...filterGroup.querySelectorAll('input:checked')].map(cb=>cb.value)});render();});
+
+ clearFocusBtn.addEventListener('click',()=>{
+    input.focus();
+    document.execCommand('selectAll', false, null);
+    document.execCommand('delete', false, null);
+ });
+ 
  copyBtn.addEventListener('click',()=>navigator.clipboard.writeText(output.textContent).then(()=>toast('Copied')));
  settingsBtn.addEventListener('click',()=>{const saved=loadSettings(); fontSizeIn.value=saved.fontSize||16;fontFamilyIn.value=saved.fontFamily||''; settingsDlg.showModal();});
  qs('save-settings').addEventListener('click',e=>{e.preventDefault();const sz=parseInt(fontSizeIn.value,10);const fam=fontFamilyIn.value.trim(); if(sz){saveSettings({fontSize:sz}); document.documentElement.style.setProperty('--font-size',sz+'px');} if(fam||true){saveSettings({fontFamily:fam}); document.documentElement.style.setProperty('--font-family',fam);} settingsDlg.close();});
