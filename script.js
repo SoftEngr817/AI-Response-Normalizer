@@ -13,7 +13,9 @@ const filters={
  italic:t=>t.replace(/(^|[\s\W])(\*|_)(?=\S)([^\r]*?\S)\2(?!\w)/g,'$1$3'),
  code:t=>t.replace(/`{1,3}([^`]*)`{1,3}/g,'$1'),
  linkText:t=>t.replace(/\[([^\]]+)]\([^)]*\)/g,'$1'),
- linkURL:t=>t.replace(/\[([^\]]+)]\((https?:\/\/)?(www\.)?([^/)]+)([^)]*?)\)/gi,(m,_t,_p,_w,d,r)=>d+r.replace(/\/$/,''))
+ linkURL:t=>t.replace(/\[[^\]]+]\((https?:\/\/[^\)]+)\)/gi, (m, url) => 
+   url.replace(/\/$/, '') // strip trailing slash
+ )
 };
 
 const normalizeAlways=raw=>raw.split(/\r?\n/).map(l=>l.replace(/\s+$/g,'')).join('\n')
@@ -39,6 +41,16 @@ const addRow=(k='',v='')=>{
 const mapToTable=map=>{qs('mapping-table').querySelector('tbody').innerHTML=''; Object.entries(map).forEach(([k,v])=>addRow(k,v));};
 const tableToMap=()=>{const obj={};[...qs('mapping-table').querySelectorAll('tbody tr')].forEach(r=>{const [a,b]=r.querySelectorAll('input'); if(a.value) obj[a.value]=b.value;});return obj;};
 
+/* L1/L2 dependency management */
+function updateL2State() {
+ const l1Checkbox = document.querySelector('input[value="linkText"]');
+ const l2Checkbox = document.querySelector('input[value="linkURL"]');
+ 
+ if (l1Checkbox && l2Checkbox) {
+   l2Checkbox.disabled = l1Checkbox.checked;
+ }
+}
+
 document.addEventListener('DOMContentLoaded',()=>{
  const input=qs('input'),output=qs('output'),clearFocusBtn=qs('clear-focus'),copyBtn=qs('copy-btn');
  const filterGroup=qs('filter-group');
@@ -54,9 +66,19 @@ document.addEventListener('DOMContentLoaded',()=>{
  if(saved.filters){[...filterGroup.querySelectorAll('input')].forEach(cb=>cb.checked=saved.filters.includes(cb.value));}
  mapToTable(saved.customMap||defaultMap);
 
+ /* Apply L1/L2 dependency on load */
+ updateL2State();
+
  const render=()=>output.textContent=processText(input.value);
  input.addEventListener('input',render);
- filterGroup.addEventListener('change',()=>{saveSettings({filters:[...filterGroup.querySelectorAll('input:checked')].map(cb=>cb.value)});render();});
+ filterGroup.addEventListener('change',(e)=>{
+   /* Update L2 state when L1 changes */
+   if (e.target.value === 'linkText') {
+     updateL2State();
+   }
+   saveSettings({filters:[...filterGroup.querySelectorAll('input:checked')].map(cb=>cb.value)});
+   render();
+ });
 
  clearFocusBtn.addEventListener('click',()=>{
     input.focus();
