@@ -33,7 +33,7 @@ dialog button{background:var(--primary);color:#fff;border:none;padding:6px 12px;
     overflow: auto;
 }
 #help-modal h2 { margin: 0 0 8px; }
-#help-modal h3 { margin: 16px 0 6px; }
+#help-modal h3 { margin: 32px 0 6px; }
 #help-modal pre {
     background: #151515;
     border: 1px solid var(--border);
