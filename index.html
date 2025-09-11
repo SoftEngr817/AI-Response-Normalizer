@@ -22,6 +22,7 @@
 
     <div class="toolbar-actions">
       <button id="open-mapping" class="settings-btn" title="Custom replacements">🛠️</button>
+      <button id="open-help" class="settings-btn" title="Help">❓</button>
       <button id="open-settings" class="settings-btn" title="Display settings">⚙️</button>
     </div>
   </header>
@@ -40,7 +41,7 @@
   <div id="toast" aria-live="polite"></div>
 
   <!-- settings -->
-  <dialog id="settings-modal">
+  <dialog id="settings-modal" style="border: 1px solid gray;">
     <form method="dialog" id="settings-form">
       <h2>Display Settings</h2>
       <label>Font size(px): <input id="font-size" type="number" min="10" max="48" step="1"></label>
@@ -50,7 +51,7 @@
   </dialog>
 
   <!-- mapping -->
-  <dialog id="mapping-modal">
+  <dialog id="mapping-modal" style="border: 1px solid gray;">
     <h2>Custom replacements</h2>
     <div class="table-wrap">
       <table id="mapping-table">
@@ -67,6 +68,76 @@
     </menu>
   </dialog>
 
+  <!-- Help Modal -->
+  <dialog id="help-modal" style="border: 1px solid gray;">
+    <article class="help-content">
+      <h2 style="text-align: center;">Help & Guide</h2>
+
+      <section>
+        <h3>What this does</h3>
+        <p>
+          Paste AI output on the left. The right pane shows a cleaned, human-typed style version.
+          Cleanup happens live as you type or toggle filters. Your choices are saved in your browser.
+        </p>
+      </section>
+
+      <section>
+        <h3>Processing order</h3>
+        <ol>
+          <li><strong>Always-on cleanup:</strong> trim trailing spaces, convert smart quotes.</li>
+          <li><strong>Filters (checkboxes):</strong> bold/italic/code/links, blank lines, etc.</li>
+          <li><strong>Custom replacements:</strong> your own “find → replace” rules (order preserved).</li>
+        </ol>
+        <p><em>Note:</em> rule order matters in the custom table—entries run top to bottom.</p>
+      </section>
+
+      <section>
+        <h3>Filters</h3>
+        <ul>
+          <li><strong>TB</strong> – remove blank lines at the very start and end</li>
+          <li><strong>CB</strong> – collapse 2+ blank lines to one</li>
+          <li><strong>B</strong> – strip <code>**bold**</code> / <code>__bold__</code> (strict Markdown)</li>
+          <li><strong>I</strong> – strip <code>*italic*</code> / <code>_italic_</code> (strict Markdown)</li>
+          <li><strong>C</strong> – strip <code>`inline code`</code></li>
+          <li><strong>L₁</strong> – convert <code>[text](url)</code> → <code>text</code></li>
+          <li><strong>L₂</strong> – convert <code>[text](url)</code> → <code>url</code></li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>Custom replacements</h3>
+        <p>
+          Click 🛠️ to open the table. Each row has a <strong>Find</strong> and <strong>Replace</strong> value.
+          It’s space-sensitive and runs in the order shown. Use <em>Export JSON</em> to download a file
+          and <em>Import JSON</em> to load one.
+        </p>
+        <p>Example rows:</p>
+        <pre><code>✅   →   -
+—    →   - 
+•    →   -</code></pre>
+      </section>
+
+      <section>
+        <h3>Display settings</h3>
+        <p>
+          Click ⚙️ to set font size and family. These apply to both panes and are saved to your browser.
+        </p>
+      </section>
+
+      <section>
+        <h3>Cautions</h3>
+        <ul>
+          <li><strong>Over-filtering:</strong> Please double-check the output when you paste complex strings or code snippets.</li>
+          <li><strong>Backup:</strong> Export the mapping JSON and keep it for later use. Feel free to download a useful example <a href="https://github.com/SoftEngr817/AI-Response-Normalizer/blob/main/resources/mapping.json" style="color: green;" target="_blank">here</a>.</li>
+        </ul>
+      </section>      
+
+      <menu>
+        <button id="help-close" style="margin-right: 12px;">Close</button>
+      </menu>
+    </article>
+  </dialog>
+  
   <script src="script.js"></script>
 </body>
 </html>

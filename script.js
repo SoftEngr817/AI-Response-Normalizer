@@ -58,6 +58,14 @@ document.addEventListener('DOMContentLoaded',()=>{
  const settingsDlg=qs('settings-modal'),mappingDlg=qs('mapping-modal');
  const fontSizeIn=qs('font-size'),fontFamilyIn=qs('font-family');
  const addRowBtn=qs('add-row'),saveMapBtn=qs('save-mapping'),exportBtn=qs('export-json'),importBtn=qs('import-json'),fileInput=qs('file-import');
+ 
+ // Help modal
+  const helpBtn   = document.getElementById('open-help');
+  const helpModal = document.getElementById('help-modal');
+  const helpClose = document.getElementById('help-close');
+
+  helpBtn.addEventListener('click', () => helpModal.showModal());
+  helpClose.addEventListener('click', () => helpModal.close());
 
  /* apply saved */
  const saved=loadSettings();

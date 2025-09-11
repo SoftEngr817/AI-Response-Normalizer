@@ -26,3 +26,18 @@ dialog button{background:var(--primary);color:#fff;border:none;padding:6px 12px;
 #mapping-table{width:100%;border-collapse:collapse}
 #mapping-table td,#mapping-table th{border:1px solid var(--border);padding:6px}
 #mapping-table input{background:transparent;border:none;color:var(--text);width:100%}
+
+#help-modal .help-content {
+    max-width: 720px;
+    max-height: 70vh;
+    overflow: auto;
+}
+#help-modal h2 { margin: 0 0 8px; }
+#help-modal h3 { margin: 16px 0 6px; }
+#help-modal pre {
+    background: #151515;
+    border: 1px solid var(--border);
+    padding: 8px;
+    border-radius: 4px;
+    overflow: auto;
+}
