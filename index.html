@@ -2,142 +2,361 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Simple Text Normalizer – Dark</title>
-  <link rel="icon" type="image/png" href="/resources/favicon.png">
+  <title>AI Response Normalizer</title>
+  <link rel="icon" type="image/png" href="resources/favicon.png">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Clean AI-generated text into plain, human-typed style: strip Markdown, tidy blank lines, and apply your own replacement rules.">
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header id="toolbar">
-    <fieldset id="filter-group">
-      <legend class="visually-hidden">Filters</legend>
-      <label class="filter"><input type="checkbox" value="trimBlanks"><abbr title="Trim blank lines at start/end">TB</abbr></label>
-      <label class="filter"><input type="checkbox" value="collapseBlanks"><abbr title="Collapse ≥2 blank lines">CB</abbr></label>
-      <label class="filter"><input type="checkbox" value="bold"><abbr title="Strip **bold**">B</abbr></label>
-      <label class="filter"><input type="checkbox" value="italic"><abbr title="Strip *italic*">I</abbr></label>
-      <label class="filter"><input type="checkbox" value="code"><abbr title="Strip `code`">C</abbr></label>
-      <label class="filter"><input type="checkbox" value="linkText"><abbr title="Links→text">L₁</abbr></label>
-      <label class="filter"><input type="checkbox" value="linkURL"><abbr title="Links→URL">L₂</abbr></label>
-    </fieldset>
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m20 6-11 11-5-5"/></symbol>
+    <symbol id="i-eraser" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></symbol>
+    <symbol id="i-grip" viewBox="0 0 24 24"><path d="M9 6h.01M15 6h.01M9 12h.01M15 12h.01M9 18h.01M15 18h.01"/></symbol>
+    <symbol id="i-up" viewBox="0 0 24 24"><path d="m18 15-6-6-6 6"/></symbol>
+    <symbol id="i-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="i-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+    <symbol id="i-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+    <symbol id="i-rules" viewBox="0 0 24 24"><path d="M4 7h7M4 12h5M4 17h7"/><path d="m15 9 3 3-3 3"/><path d="M20 12h-6"/></symbol>
+    <symbol id="i-import" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></symbol>
+    <symbol id="i-export" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></symbol>
+    <symbol id="i-undo" viewBox="0 0 24 24"><path d="M3 7v6h6"/><path d="M3.5 13a9 9 0 1 0 2.6-8.6L3 7"/></symbol>
+    <symbol id="i-save" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></symbol>
+  </svg>
 
-    <div class="toolbar-actions">
-      <button id="open-mapping" class="settings-btn" title="Custom replacements">🛠️</button>
-      <button id="open-help" class="settings-btn" title="Help">❓</button>
-      <button id="open-settings" class="settings-btn" title="Display settings">⚙️</button>
+  <header id="topbar">
+    <div class="topbar-main">
+      <div class="brand">
+        <img class="brand-mark" src="resources/favicon.png" alt="" width="26" height="26">
+        <span class="brand-name">AI Response Normalizer</span>
+      </div>
+
+      <div class="topbar-actions">
+        <button type="button" id="toggle-rules" class="btn btn-ghost btn-rules" aria-expanded="false" aria-controls="rules-panel">
+          <svg class="i" aria-hidden="true"><use href="#i-rules"/></svg>
+          <span>Replacements</span>
+          <span class="pill" id="rules-badge" aria-hidden="true">0</span>
+        </button>
+        <button type="button" id="open-help" class="icon-btn" aria-label="Help and guide" title="Help and guide">
+          <svg class="i" aria-hidden="true"><use href="#i-help"/></svg>
+        </button>
+        <button type="button" id="open-settings" class="icon-btn" aria-label="Display settings" title="Display settings">
+          <svg class="i" aria-hidden="true"><use href="#i-sliders"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="topbar-filters">
+      <div id="filter-bar" class="filter-bar" role="group" aria-label="Cleanup filters"></div>
+      <div class="preset-wrap">
+        <label class="preset-label" for="preset-select">Preset</label>
+        <select id="preset-select" class="select">
+          <option value="plain">Plain text</option>
+          <option value="light">Light touch</option>
+          <option value="none">Nothing</option>
+          <option value="custom" disabled>Custom</option>
+        </select>
+      </div>
     </div>
   </header>
 
-  <main>
-    <section class="pane">
-      <textarea id="input" placeholder="Paste AI response…"></textarea>
-      <button id="clear-focus" class="btn-over-textarea">Clear & Focus</button>
+  <main id="workspace">
+    <section class="pane" aria-labelledby="input-title">
+      <div class="pane-head">
+        <h2 class="pane-title" id="input-title">AI response</h2>
+        <span class="pane-stats" id="input-stats"></span>
+        <div class="pane-head-actions">
+          <button type="button" id="load-sample" class="btn btn-ghost btn-sm">Try a sample</button>
+          <button type="button" id="clear-focus" class="btn btn-ghost btn-sm">
+            <svg class="i" aria-hidden="true"><use href="#i-eraser"/></svg>
+            <span>Clear</span>
+          </button>
+        </div>
+      </div>
+      <div class="pane-body">
+        <textarea id="input" spellcheck="false" aria-labelledby="input-title" placeholder="Paste the AI response here…"></textarea>
+      </div>
     </section>
-    <section class="pane">
-      <div id="output" class="output"></div>
-      <button id="copy-btn" class="btn-over-textarea">Copy Text</button>
+
+    <aside id="rules-panel" aria-label="Custom replacements">
+      <button type="button" id="rail" class="rail" aria-expanded="false" aria-controls="rules-panel">
+        <svg class="i" aria-hidden="true"><use href="#i-right"/></svg>
+        <span class="rail-text">Replacements</span>
+        <span class="pill" id="rail-badge">0</span>
+      </button>
+
+      <div class="rules-inner">
+        <div class="rules-head">
+          <h2 class="rules-title">Replacements</h2>
+          <span class="dirty-dot" id="rules-dirty" hidden>Unsaved</span>
+          <button type="button" id="collapse-rules" class="icon-btn icon-btn-sm" aria-label="Collapse replacements panel" title="Collapse panel">
+            <svg class="i" aria-hidden="true"><use href="#i-left"/></svg>
+          </button>
+        </div>
+
+        <p class="rules-hint">Applied top to bottom, after the filters. Changes preview instantly; press Save to keep them.</p>
+
+        <ol class="rules-list" id="rules-list"></ol>
+
+        <div class="rules-empty" id="rules-empty" hidden>
+          <p>No replacement rules yet.</p>
+          <p class="muted">Rules swap exact text, spaces included — for example <code>“*&nbsp;”</code> into <code>“-&nbsp;”</code>.</p>
+          <button type="button" id="load-example-rules" class="btn btn-ghost btn-sm">Load example rules</button>
+        </div>
+
+        <div class="rules-foot">
+          <div class="rules-foot-row">
+            <button type="button" id="add-rule" class="btn btn-ghost btn-sm">
+              <svg class="i" aria-hidden="true"><use href="#i-plus"/></svg>
+              <span>Add rule</span>
+            </button>
+            <span class="spacer"></span>
+            <button type="button" id="import-json" class="icon-btn icon-btn-sm" aria-label="Import rules from JSON" title="Import rules from JSON">
+              <svg class="i" aria-hidden="true"><use href="#i-import"/></svg>
+            </button>
+            <button type="button" id="export-json" class="icon-btn icon-btn-sm" aria-label="Export rules as JSON" title="Export rules as JSON">
+              <svg class="i" aria-hidden="true"><use href="#i-export"/></svg>
+            </button>
+            <input type="file" id="file-import" accept=".json,application/json" hidden>
+          </div>
+          <div class="rules-foot-row">
+            <button type="button" id="revert-rules" class="btn btn-ghost btn-sm" disabled>
+              <svg class="i" aria-hidden="true"><use href="#i-undo"/></svg>
+              <span>Revert</span>
+            </button>
+            <button type="button" id="save-rules" class="btn btn-primary btn-sm btn-grow" disabled>
+              <svg class="i" aria-hidden="true"><use href="#i-save"/></svg>
+              <span>Save</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <section class="pane" aria-labelledby="output-title">
+      <div class="pane-head">
+        <h2 class="pane-title" id="output-title">Cleaned text</h2>
+        <span class="pane-stats" id="output-stats"></span>
+        <div class="pane-head-actions">
+          <button type="button" id="copy-btn" class="btn btn-primary btn-sm">
+            <svg class="i" aria-hidden="true"><use href="#i-copy"/></svg>
+            <span class="copy-label">Copy</span>
+          </button>
+        </div>
+      </div>
+      <div class="pane-body">
+        <div id="output" class="output" tabindex="0" role="textbox" aria-readonly="true" aria-multiline="true" aria-labelledby="output-title" data-placeholder="The cleaned version appears here as you type."></div>
+      </div>
     </section>
   </main>
 
-  <div id="toast" aria-live="polite"></div>
+  <div class="scrim" id="scrim" hidden></div>
+  <div id="toast" role="status" aria-live="polite"></div>
 
-  <!-- settings -->
-  <dialog id="settings-modal" style="border: 1px solid gray;">
-    <form method="dialog" id="settings-form">
-      <h2>Display Settings</h2>
-      <label>Font size(px): <input id="font-size" type="number" min="10" max="48" step="1"></label>
-      <label>Font family: <input id="font-family" type="text" placeholder="e.g., monospace"></label>
-      <menu><button value="cancel">Cancel</button><button id="save-settings">Save</button></menu>
-    </form>
-  </dialog>
-
-  <!-- mapping -->
-  <dialog id="mapping-modal" style="border: 1px solid gray;">
-    <h2>Custom replacements</h2>
-    <div class="table-wrap">
-      <table id="mapping-table">
-        <thead><tr><th>Find</th><th>Replace</th><th></th></tr></thead>
-        <tbody></tbody>
-      </table>
+  <div id="popover" class="popover" role="dialog" aria-labelledby="popover-title" tabindex="-1" hidden>
+    <div class="popover-head">
+      <h3 class="popover-title" id="popover-title"></h3>
+      <button type="button" class="icon-btn icon-btn-sm" id="popover-close" aria-label="Close">
+        <svg class="i" aria-hidden="true"><use href="#i-close"/></svg>
+      </button>
     </div>
-    <menu>
-      <button id="add-row">＋Row</button>
-      <input type="file" id="file-import" accept=".json" hidden>
-      <button id="import-json">Import JSON</button>
-      <button id="export-json">Export JSON</button>
-      <button id="save-mapping">Save & Close</button>
-    </menu>
+    <p class="popover-desc" id="popover-desc"></p>
+    <div class="example" id="popover-example"></div>
+    <button type="button" class="link-btn" id="popover-learn">Learn more in Help</button>
+  </div>
+
+  <dialog id="settings-modal" class="dialog" aria-labelledby="settings-title">
+    <div class="dialog-head">
+      <h2 id="settings-title">Display settings</h2>
+      <button type="button" class="icon-btn icon-btn-sm" data-close="settings-modal" aria-label="Close display settings">
+        <svg class="i" aria-hidden="true"><use href="#i-close"/></svg>
+      </button>
+    </div>
+    <div class="dialog-body">
+      <div class="field-row">
+        <label for="font-size">Font size</label>
+        <div class="control-pair">
+          <input type="range" id="font-size-range" min="11" max="28" step="1" aria-label="Font size slider">
+          <input type="number" id="font-size" min="10" max="48" step="1" class="input input-num">
+          <span class="unit">px</span>
+        </div>
+      </div>
+      <div class="field-row">
+        <label for="font-family">Font</label>
+        <select id="font-family" class="select">
+          <option value="monospace">Monospace (default)</option>
+          <option value="ui-sans-serif, system-ui, sans-serif">Sans serif</option>
+          <option value="Georgia, 'Times New Roman', serif">Serif</option>
+          <option value="__custom">Custom…</option>
+        </select>
+      </div>
+      <div class="field-row" id="font-custom-row" hidden>
+        <label for="font-custom">Custom font</label>
+        <input type="text" id="font-custom" class="input" placeholder="e.g. Consolas, monospace">
+      </div>
+      <p class="muted">Changes preview live in both panes.</p>
+    </div>
+    <div class="dialog-foot">
+      <button type="button" id="reset-display" class="btn btn-ghost btn-sm">Reset to defaults</button>
+      <span class="spacer"></span>
+      <button type="button" id="cancel-settings" class="btn btn-ghost">Cancel</button>
+      <button type="button" id="save-settings" class="btn btn-primary">Save</button>
+    </div>
   </dialog>
 
-  <!-- Help Modal -->
-  <dialog id="help-modal" style="border: 1px solid gray;">
-    <article class="help-content">
-      <h2 style="text-align: center;">Help & Guide</h2>
+  <dialog id="help-modal" class="dialog dialog-wide" aria-labelledby="help-title">
+    <div class="dialog-head">
+      <h2 id="help-title">Help &amp; guide</h2>
+      <button type="button" class="icon-btn icon-btn-sm" data-close="help-modal" aria-label="Close help">
+        <svg class="i" aria-hidden="true"><use href="#i-close"/></svg>
+      </button>
+    </div>
 
-      <section>
-        <h3>What this does</h3>
-        <p>
-          Paste AI output on the left. The right pane shows a cleaned, human-typed style version.
-          Cleanup happens live as you type or toggle filters. Your choices are saved in your browser.
-        </p>
-      </section>
+    <div class="help-body">
+      <nav class="help-nav" aria-label="Help sections">
+        <button type="button" class="help-nav-link is-active" data-target="help-overview">Overview</button>
+        <button type="button" class="help-nav-link" data-target="help-filters">Filters</button>
+        <button type="button" class="help-nav-link" data-target="help-rules">Replacements</button>
+        <button type="button" class="help-nav-link" data-target="help-display">Display</button>
+        <button type="button" class="help-nav-link" data-target="help-shortcuts">Shortcuts</button>
+        <button type="button" class="help-nav-link" data-target="help-cautions">Cautions</button>
+      </nav>
 
-      <section>
-        <h3>Processing order</h3>
-        <ol>
-          <li><strong>Always-on cleanup:</strong> trim trailing spaces, convert smart quotes.</li>
-          <li><strong>Filters (checkboxes):</strong> bold/italic/code/links, blank lines, etc.</li>
-          <li><strong>Custom replacements:</strong> your own “find → replace” rules (order preserved).</li>
-        </ol>
-        <p><em>Note:</em> rule order matters in the custom table—entries run top to bottom.</p>
-      </section>
+      <div class="help-scroll" id="help-scroll">
+        <section id="help-overview" class="help-section">
+          <h3>Overview</h3>
+          <p>
+            Paste an AI answer into the left pane. The right pane shows the same text rewritten in a plainer,
+            hand-typed style. Everything happens in your browser as you type, and your filters, rules and
+            display preferences are saved locally.
+          </p>
+          <p>Text passes through three stages, in this order:</p>
+          <ol class="steps">
+            <li>
+              <strong>Always-on tidying</strong>
+              <span class="muted">Trailing spaces are removed from the end of each line, and curly quotes become straight quotes.</span>
+            </li>
+            <li>
+              <strong>Filters</strong>
+              <span class="muted">The toggles in the top bar, applied left to right.</span>
+            </li>
+            <li>
+              <strong>Replacements</strong>
+              <span class="muted">Your own find-and-replace rules, applied top to bottom.</span>
+            </li>
+          </ol>
+          <p>
+            Every filter shows a number when it has something to change in your current text, so you can
+            tell what a toggle will do before you flip it. A dash means it would change nothing.
+          </p>
+        </section>
 
-      <section>
-        <h3>Filters</h3>
-        <ul>
-          <li><strong>TB</strong> – remove blank lines at the very start and end</li>
-          <li><strong>CB</strong> – collapse 2+ blank lines to one</li>
-          <li><strong>B</strong> – strip <code>**bold**</code> / <code>__bold__</code> (strict Markdown)</li>
-          <li><strong>I</strong> – strip <code>*italic*</code> / <code>_italic_</code> (strict Markdown)</li>
-          <li><strong>C</strong> – strip <code>`inline code`</code></li>
-          <li><strong>L₁</strong> – convert <code>[text](url)</code> → <code>text</code></li>
-          <li><strong>L₂</strong> – convert <code>[text](url)</code> → <code>url</code></li>
-        </ul>
-      </section>
+        <section id="help-filters" class="help-section">
+          <h3>Filters</h3>
+          <p>Each filter runs only when it is switched on. Turning one off never loses your original text — the left pane is untouched.</p>
+          <div id="help-filter-list"></div>
+        </section>
 
-      <section>
-        <h3>Custom replacements</h3>
-        <p>
-          Click 🛠️ to open the table. Each row has a <strong>Find</strong> and <strong>Replace</strong> value.
-          It’s space-sensitive and runs in the order shown. Use <em>Export JSON</em> to download a file
-          and <em>Import JSON</em> to load one.
-        </p>
-        <p>Example rows:</p>
-        <pre><code>✅   →   -
-—    →   - 
-•    →   -</code></pre>
-      </section>
+        <section id="help-rules" class="help-section">
+          <h3>Replacements</h3>
+          <p>
+            The middle panel holds your own rules. Each rule swaps one exact piece of text for another,
+            and they run from top to bottom after the filters.
+          </p>
+          <ul>
+            <li><strong>Order matters.</strong> A rule sees the result of the rules above it. Drag the handle, or focus a rule and press <kbd>Alt</kbd> + <kbd>↑</kbd> / <kbd>↓</kbd>, to move it.</li>
+            <li><strong>Spaces count.</strong> <code>"*&nbsp;"</code> with a trailing space is a different rule from <code>"*"</code>. A <span class="ws-flag-demo">␣</span> marker appears when a field starts or ends with a space.</li>
+            <li><strong>Switch instead of delete.</strong> The toggle on each rule turns it off without throwing it away.</li>
+            <li><strong>Nothing is plain-text magic.</strong> Rules match literally, not as patterns, so <code>.</code> and <code>*</code> mean themselves.</li>
+            <li><strong>Preview then save.</strong> Edits show up in the output immediately, but only <em>Save</em> stores them for your next visit.</li>
+          </ul>
+          <p>A useful starting set:</p>
+          <div class="example-table" role="table" aria-label="Example replacement rules">
+            <div role="row"><span role="cell"><code>*␣</code></span><span aria-hidden="true">→</span><span role="cell"><code>-␣</code></span></div>
+            <div role="row"><span role="cell"><code>###␣</code></span><span aria-hidden="true">→</span><span role="cell"><code class="empty-cell">(nothing)</code></span></div>
+            <div role="row"><span role="cell"><code>—</code></span><span aria-hidden="true">→</span><span role="cell"><code>␣-␣</code></span></div>
+            <div role="row"><span role="cell"><code>🔹</code></span><span aria-hidden="true">→</span><span role="cell"><code>-</code></span></div>
+          </div>
+          <p class="muted">Here <code>␣</code> stands for a real space you would type.</p>
+          <h4>Import and export</h4>
+          <p>
+            Export writes a JSON file holding your rules, their order and their on/off state. Import reads
+            that file back, and also accepts the older <code>{"find": "replace"}</code> style, so any mapping
+            file you saved before still loads. An imported set previews right away and waits for you to Save.
+          </p>
+        </section>
 
-      <section>
-        <h3>Display settings</h3>
-        <p>
-          Click ⚙️ to set font size and family. These apply to both panes and are saved to your browser.
-        </p>
-      </section>
+        <section id="help-display" class="help-section">
+          <h3>Display</h3>
+          <p>
+            The sliders button opens font size and font family for both panes. Changes preview as you make
+            them, <em>Cancel</em> puts things back, and <em>Save</em> keeps them for next time.
+          </p>
+        </section>
 
-      <section>
-        <h3>Cautions</h3>
-        <ul>
-          <li><strong>Over-filtering:</strong> Please double-check the output when you paste complex strings or code snippets.</li>
-          <li><strong>Backup:</strong> Export the mapping JSON and keep it for later use. Feel free to download a useful example <a href="https://github.com/SoftEngr817/AI-Response-Normalizer/blob/main/resources/mapping.json" style="color: green;" target="_blank">here</a>.</li>
-        </ul>
-      </section>      
+        <section id="help-shortcuts" class="help-section">
+          <h3>Shortcuts</h3>
+          <dl class="shortcuts">
+            <dt><kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>S</kbd></dt><dd>Save replacement rules</dd>
+            <dt><kbd>Alt</kbd> + <kbd>↑</kbd> / <kbd>↓</kbd></dt><dd>Move the focused rule up or down</dd>
+            <dt><kbd>Esc</kbd></dt><dd>Close a dialog, popover or the rules panel</dd>
+          </dl>
+        </section>
 
-      <menu>
-        <button id="help-close" style="margin-right: 12px;">Close</button>
-      </menu>
-    </article>
+        <section id="help-cautions" class="help-section">
+          <h3>Cautions</h3>
+          <ul>
+            <li><strong>Check code and complex text.</strong> Stripping Markdown can eat characters that mattered, such as the asterisks in a code sample. Compare both panes before you trust the result.</li>
+            <li><strong>Keep a backup.</strong> Your rules live in this browser's local storage, so clearing site data removes them. Export a copy now and then. A ready-made example lives <a href="https://github.com/SoftEngr817/AI-Response-Normalizer/blob/main/resources/mapping.json" target="_blank" rel="noopener">on GitHub</a>.</li>
+          </ul>
+        </section>
+      </div>
+    </div>
   </dialog>
-  
+
+  <template id="rule-template">
+    <li class="rule">
+      <div class="rule-top">
+        <span class="rule-grip" draggable="true" tabindex="0" role="button" aria-label="Reorder rule" title="Drag, or press the arrow keys">
+          <svg class="i" aria-hidden="true"><use href="#i-grip"/></svg>
+        </span>
+        <label class="switch">
+          <input type="checkbox" class="rule-enabled" checked>
+          <span class="switch-track" aria-hidden="true"></span>
+          <span class="switch-text">On</span>
+        </label>
+        <span class="spacer"></span>
+        <span class="rule-hits" aria-live="off"></span>
+        <button type="button" class="icon-btn icon-btn-xs rule-move-up" aria-label="Move rule up">
+          <svg class="i" aria-hidden="true"><use href="#i-up"/></svg>
+        </button>
+        <button type="button" class="icon-btn icon-btn-xs rule-move-down" aria-label="Move rule down">
+          <svg class="i" aria-hidden="true"><use href="#i-down"/></svg>
+        </button>
+        <button type="button" class="icon-btn icon-btn-xs rule-delete" aria-label="Delete rule">
+          <svg class="i" aria-hidden="true"><use href="#i-close"/></svg>
+        </button>
+      </div>
+      <div class="rule-fields">
+        <span class="field-wrap">
+          <input type="text" class="input rule-find" placeholder="Find" spellcheck="false" autocomplete="off">
+          <span class="ws-flag" hidden title="Starts or ends with a space">␣</span>
+        </span>
+        <span class="rule-arrow" aria-hidden="true">→</span>
+        <span class="field-wrap">
+          <input type="text" class="input rule-replace" placeholder="Replace with" spellcheck="false" autocomplete="off">
+          <span class="ws-flag" hidden title="Starts or ends with a space">␣</span>
+        </span>
+      </div>
+    </li>
+  </template>
+
   <script src="script.js"></script>
 </body>
 </html>
