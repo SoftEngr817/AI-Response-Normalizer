@@ -579,6 +579,18 @@ function updateWsFlag(input) {
   if (flag) flag.hidden = !/^\s|\s$/.test(input.value);
 }
 
+function syncSwitchLabel(row, enabled) {
+  row.querySelector('.switch').title = enabled ? 'On — click to skip this rule' : 'Off — click to apply this rule';
+}
+
+/* Away from the row the placeholder states what an empty field does; inside it,
+   it goes back to telling you what to type. */
+function syncReplacePlaceholder(row, focused) {
+  const replace = row.querySelector('.rule-replace');
+  replace.placeholder = focused ? 'Replace with' : 'Empty string';
+  replace.classList.toggle('is-empty-hint', !focused);
+}
+
 function ruleRow(rule) {
   const row = el('rule-template').content.firstElementChild.cloneNode(true);
   row.dataset.uid = rule.uid;
@@ -587,7 +599,8 @@ function ruleRow(rule) {
   const toggle = row.querySelector('.rule-enabled');
   toggle.checked = rule.enabled;
   toggle.setAttribute('aria-label', 'Apply this rule');
-  row.querySelector('.switch-text').textContent = rule.enabled ? 'On' : 'Off';
+  syncSwitchLabel(row, rule.enabled);
+  syncReplacePlaceholder(row, false);
 
   const find = row.querySelector('.rule-find');
   const replace = row.querySelector('.rule-replace');
@@ -650,7 +663,9 @@ function moveRule(uid, delta, refocus) {
   renderRules();
   render();
   const row = el('rules-list').querySelector(`[data-uid="${uid}"]`);
-  if (row) (row.querySelector(refocus) || row.querySelector('.rule-grip')).focus();
+  if (!row) return;
+  row.classList.add('is-reordering');
+  (row.querySelector(refocus) || row.querySelector('.rule-grip')).focus();
 }
 
 function saveRules() {
@@ -711,9 +726,27 @@ function bindRulesList() {
     if (!rule) return;
     rule.enabled = event.target.checked;
     row.classList.toggle('is-off', !rule.enabled);
-    row.querySelector('.switch-text').textContent = rule.enabled ? 'On' : 'Off';
+    syncSwitchLabel(row, rule.enabled);
     updateRuleChrome();
     render();
+  });
+
+  list.addEventListener('focusin', event => {
+    const row = event.target.closest('.rule');
+    if (row) syncReplacePlaceholder(row, true);
+  });
+
+  list.addEventListener('focusout', event => {
+    const row = event.target.closest('.rule');
+    if (!row || row.contains(event.relatedTarget)) return;
+    syncReplacePlaceholder(row, false);
+    row.classList.remove('is-reordering');
+  });
+
+  /* Touch has no hover, so tapping the handle is what brings the arrows out. */
+  list.addEventListener('pointerdown', event => {
+    const grip = event.target.closest('.rule-grip');
+    if (grip) grip.focus();
   });
 
   list.addEventListener('click', event => {
@@ -805,11 +838,18 @@ function updateScrim() {
   el('scrim').hidden = !(state.rulesOpen && drawerMode());
 }
 
+/* A closed drawer is only pushed off-screen, so it has to be made inert or its
+   controls stay in the tab order. */
+function syncPanelInert() {
+  el('rules-panel').toggleAttribute('inert', drawerMode() && !state.rulesOpen);
+}
+
 function setRulesOpen(open, persist = true) {
   state.rulesOpen = open;
   document.body.classList.toggle('rules-open', open);
   el('toggle-rules').setAttribute('aria-expanded', String(open));
   el('rail').setAttribute('aria-expanded', String(open));
+  syncPanelInert();
   updateScrim();
   if (!persist) return;
   writeSettings({ rulesOpen: open });
@@ -1187,6 +1227,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window.addEventListener('resize', () => {
     closePopover();
+    syncPanelInert();
     updateScrim();
   });
 

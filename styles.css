@@ -261,41 +261,53 @@ body:not(.rules-open) .rules-inner { display: none; }
 .rules-empty p { margin: 0; font-size: 13px; line-height: 1.5; }
 .rules-empty code { background: var(--code-bg); border: 1px solid var(--border); border-radius: var(--r-1); padding: 1px 4px; }
 
-.rule { border: 1px solid var(--border); border-radius: var(--r-2); background: var(--surface-2); padding: 5px 6px 7px; display: grid; gap: 5px; }
+.rule { border: 1px solid var(--border); border-radius: var(--r-2); background: var(--surface-2); padding: 4px 4px 4px 2px; display: flex; align-items: center; gap: 3px; }
 .rule.is-off { opacity: .55; }
 .rule.is-dragging { opacity: .35; }
 .rule.drop-before { box-shadow: inset 0 2px 0 0 var(--accent); }
 .rule.drop-after { box-shadow: inset 0 -2px 0 0 var(--accent); }
-.rule-top { display: flex; align-items: center; gap: 2px; }
-.rule-grip { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 24px; color: var(--text-faint); cursor: grab; border-radius: var(--r-1); }
-.rule-grip:hover { color: var(--text); background: var(--surface-3); }
-.rule-hits { font-size: 11px; color: var(--text-faint); font-variant-numeric: tabular-nums; padding: 0 4px; }
+
+.rule-reorder { display: inline-flex; align-items: center; flex: none; }
+.rule-grip { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 24px; flex: none; color: var(--text-faint); cursor: grab; border-radius: var(--r-1); }
+.rule-grip:hover, .rule-grip:focus-visible { color: var(--text); }
+/* The arrows stay collapsed until the pointer or keyboard reaches the handle, so
+   the rule fields keep the width in a panel this narrow. */
+.rule-move {
+  width: 0; height: 22px; min-width: 0; padding: 0; border: 0; overflow: hidden;
+  visibility: hidden; opacity: 0;
+  transition: width .12s ease, opacity .12s ease, visibility .12s;
+}
+.rule-move .i { width: 13px; height: 13px; }
+.rule-reorder:hover .rule-move,
+.rule-reorder:focus-within .rule-move,
+.rule.is-reordering .rule-move { width: 19px; visibility: visible; opacity: 1; }
+
+.rule-hits { flex: none; font-size: 10.5px; color: var(--text-faint); font-variant-numeric: tabular-nums; }
 .rule-hits[data-hits="yes"] { color: var(--warn); }
-.rule-move-up, .rule-move-down { opacity: 0; transition: opacity .12s; }
-.rule:hover .rule-move-up, .rule:hover .rule-move-down,
-.rule:focus-within .rule-move-up, .rule:focus-within .rule-move-down { opacity: 1; }
+.rule-delete { width: 20px; height: 20px; flex: none; }
+.rule-delete .i { width: 13px; height: 13px; }
 .rule-delete:hover { color: var(--danger); }
-.rule-fields { display: grid; grid-template-columns: minmax(0, 1fr) 14px minmax(0, 1fr); gap: 4px; align-items: center; }
-.rule-arrow { text-align: center; color: var(--text-faint); font-size: 12px; }
-.field-wrap { position: relative; display: block; min-width: 0; }
-.field-wrap .input { padding-right: 22px; font-family: var(--ui-font); font-size: 13px; }
+.rule-arrow { flex: none; width: 10px; text-align: center; color: var(--text-faint); font-size: 11px; }
+
+.field-wrap { position: relative; display: block; flex: 1 1 50%; min-width: 0; }
+.field-wrap .input { padding: 5px 17px 5px 6px; font-family: var(--ui-font); font-size: 12.5px; }
+.rule-replace.is-empty-hint::placeholder { font-style: italic; color: var(--text-faint); }
 .ws-flag {
-  position: absolute; right: 3px; top: 50%; transform: translateY(-50%);
+  position: absolute; right: 2px; top: 50%; transform: translateY(-50%);
   display: inline-flex; align-items: center; justify-content: center;
-  width: 15px; height: 15px; border-radius: 3px;
+  width: 13px; height: 14px; border-radius: 3px;
   background: rgba(224, 176, 84, .2); color: var(--warn);
-  font-family: monospace; font-size: 12px; line-height: 1; pointer-events: none;
+  font-family: monospace; font-size: 11px; line-height: 1; pointer-events: none;
 }
 .ws-flag-demo { color: var(--warn); }
 
-.switch { display: inline-flex; align-items: center; gap: 5px; cursor: pointer; }
+.switch { display: inline-flex; align-items: center; flex: none; cursor: pointer; }
 .switch input { position: absolute; opacity: 0; width: 1px; height: 1px; }
-.switch-track { position: relative; width: 28px; height: 16px; border-radius: var(--r-full); background: var(--surface-3); border: 1px solid var(--border-strong); transition: background .15s, border-color .15s; }
-.switch-track::after { content: ''; position: absolute; top: 2px; left: 2px; width: 10px; height: 10px; border-radius: 50%; background: var(--text-faint); transition: transform .15s, background .15s; }
+.switch-track { position: relative; width: 26px; height: 15px; border-radius: var(--r-full); background: var(--surface-3); border: 1px solid var(--border-strong); transition: background .15s, border-color .15s; }
+.switch-track::after { content: ''; position: absolute; top: 2px; left: 2px; width: 9px; height: 9px; border-radius: 50%; background: var(--text-faint); transition: transform .15s, background .15s; }
 .switch input:checked + .switch-track { background: var(--accent-strong); border-color: var(--accent-strong); }
-.switch input:checked + .switch-track::after { transform: translateX(12px); background: #fff; }
+.switch input:checked + .switch-track::after { transform: translateX(11px); background: #fff; }
 .switch input:focus-visible + .switch-track { outline: 2px solid var(--focus); outline-offset: 2px; }
-.switch-text { font-size: 11px; color: var(--text-faint); min-width: 20px; }
 
 .rules-foot { border-top: 1px solid var(--border); padding: var(--s-2); display: grid; gap: 6px; }
 .rules-foot-row { display: flex; align-items: center; gap: 6px; }
@@ -419,10 +431,10 @@ kbd {
     position: fixed; top: 0; right: 0; bottom: 0; left: auto;
     width: min(400px, 92vw); z-index: 40; padding: var(--s-3);
     background: var(--bg); box-shadow: var(--shadow);
-    transform: translateX(101%); visibility: hidden;
-    transition: transform .22s ease, visibility .22s;
+    transform: translateX(101%);
+    transition: transform .22s ease;
   }
-  body.rules-open #rules-panel { transform: none; visibility: visible; }
+  body.rules-open #rules-panel { transform: none; }
   .rail { display: none !important; }
   body:not(.rules-open) .rules-inner { display: flex; }
 }

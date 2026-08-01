@@ -270,7 +270,7 @@
             and they run from top to bottom after the filters.
           </p>
           <ul>
-            <li><strong>Order matters.</strong> A rule sees the result of the rules above it. Drag the handle, or focus a rule and press <kbd>Alt</kbd> + <kbd>↑</kbd> / <kbd>↓</kbd>, to move it.</li>
+            <li><strong>Order matters.</strong> A rule sees the result of the rules above it. To move one, drag its handle, or point at the handle to bring out the up and down arrows, or focus the rule and press <kbd>Alt</kbd> + <kbd>↑</kbd> / <kbd>↓</kbd>.</li>
             <li><strong>Spaces count.</strong> <code>"*&nbsp;"</code> with a trailing space is a different rule from <code>"*"</code>. A <span class="ws-flag-demo">␣</span> marker appears when a field starts or ends with a space.</li>
             <li><strong>Switch instead of delete.</strong> The toggle on each rule turns it off without throwing it away.</li>
             <li><strong>Nothing is plain-text magic.</strong> Rules match literally, not as patterns, so <code>.</code> and <code>*</code> mean themselves.</li>
@@ -322,38 +322,34 @@
 
   <template id="rule-template">
     <li class="rule">
-      <div class="rule-top">
+      <span class="rule-reorder">
         <span class="rule-grip" draggable="true" tabindex="0" role="button" aria-label="Reorder rule" title="Drag, or press the arrow keys">
           <svg class="i" aria-hidden="true"><use href="#i-grip"/></svg>
         </span>
-        <label class="switch">
-          <input type="checkbox" class="rule-enabled" checked>
-          <span class="switch-track" aria-hidden="true"></span>
-          <span class="switch-text">On</span>
-        </label>
-        <span class="spacer"></span>
-        <span class="rule-hits" aria-live="off"></span>
-        <button type="button" class="icon-btn icon-btn-xs rule-move-up" aria-label="Move rule up">
+        <button type="button" class="icon-btn rule-move rule-move-up" aria-label="Move rule up" title="Move up">
           <svg class="i" aria-hidden="true"><use href="#i-up"/></svg>
         </button>
-        <button type="button" class="icon-btn icon-btn-xs rule-move-down" aria-label="Move rule down">
+        <button type="button" class="icon-btn rule-move rule-move-down" aria-label="Move rule down" title="Move down">
           <svg class="i" aria-hidden="true"><use href="#i-down"/></svg>
         </button>
-        <button type="button" class="icon-btn icon-btn-xs rule-delete" aria-label="Delete rule">
-          <svg class="i" aria-hidden="true"><use href="#i-close"/></svg>
-        </button>
-      </div>
-      <div class="rule-fields">
-        <span class="field-wrap">
-          <input type="text" class="input rule-find" placeholder="Find" spellcheck="false" autocomplete="off">
-          <span class="ws-flag" hidden title="Starts or ends with a space">␣</span>
-        </span>
-        <span class="rule-arrow" aria-hidden="true">→</span>
-        <span class="field-wrap">
-          <input type="text" class="input rule-replace" placeholder="Replace with" spellcheck="false" autocomplete="off">
-          <span class="ws-flag" hidden title="Starts or ends with a space">␣</span>
-        </span>
-      </div>
+      </span>
+      <label class="switch">
+        <input type="checkbox" class="rule-enabled" checked>
+        <span class="switch-track" aria-hidden="true"></span>
+      </label>
+      <span class="field-wrap">
+        <input type="text" class="input rule-find" placeholder="Find" spellcheck="false" autocomplete="off">
+        <span class="ws-flag" hidden title="Starts or ends with a space">␣</span>
+      </span>
+      <span class="rule-arrow" aria-hidden="true">→</span>
+      <span class="field-wrap">
+        <input type="text" class="input rule-replace" placeholder="Empty string" spellcheck="false" autocomplete="off">
+        <span class="ws-flag" hidden title="Starts or ends with a space">␣</span>
+      </span>
+      <span class="rule-hits" aria-live="off"></span>
+      <button type="button" class="icon-btn icon-btn-xs rule-delete" aria-label="Delete rule" title="Delete rule">
+        <svg class="i" aria-hidden="true"><use href="#i-close"/></svg>
+      </button>
     </li>
   </template>
 
